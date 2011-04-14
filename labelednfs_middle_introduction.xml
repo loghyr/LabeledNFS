@@ -13,7 +13,7 @@
 
   <t>
     Access control models such as Unix permissions or Access Control
-    Lists are commonly refered to as Discretionary Access Control (DAC)
+    Lists are commonly referred to as Discretionary Access Control (DAC)
     models.  These systems base their access decisions on user identity
     and resource ownership.  In contrast MAC models base their access
     control decisions on the label on the subject (usually a process) and
@@ -25,7 +25,7 @@
     users do not have the ability to override.  DAC systems offer no real
     protection against malicious or flawed software due to each program
     running with the full permissions of the user executing it.
-    Inversely MAC models can confine malicious of flawed software and
+    Inversely MAC models can confine malicious or flawed software and
     usually act at a finer granularity than their DAC counterparts.
   </t>
 
@@ -91,7 +91,7 @@
   <t>
     The second change necessary is a modification to the RPC layer used
     in NFSv4 in the form of a new version of the
-    RPCSECGSS <xref target='ref:RFC2203' /> framework.
+    RPCSEC_GSS <xref target='ref:RFC2203' /> framework.
     In order for an NFSv4 server to apply MAC checks it must obtain
     additional information from the client.  Several methods were explored for
     performing this and it was decided that the best approach was to
@@ -199,7 +199,7 @@
     attributes to the file and directories used to hold the security
     attribute for the file in question.  The inability to atomically
     assign the security attribute on file creation and the necessity to
-    assign security attributes to its subcomponents makes named
+    assign security attributes to its sub-components makes named
     attributes unacceptable as a method for storing security attributes.
   </t>
 
@@ -211,7 +211,7 @@
     resolve this the security attribute consists of two components.  The
     first component is a LFS as defined in <xref target='ref:lfsreg' />
     to allow for interoperability between MAC
-    mechanisms.  The second component is an opaque field which the actual
+    mechanisms.  The second component is an opaque field which is the actual
     security attribute data.  To allow for various MAC models NFSv4
     should be used solely as a transport mechanism for the security
     attribute.  It is the responsibility of the endpoints to consume the
@@ -232,7 +232,7 @@
 
     <figure anchor='fig:xdr'>
       <artwork>
-    const FATTR4_CHANGE_ATTR_TYPE   = 81;
+    const FATTR4_SEC_LABEL   = 81;
 
     typedef uint32_t  policy4;
     struct labelformat_spec4 = {
@@ -262,6 +262,14 @@
       contains the data of the attribute.  This component is dependent on
       the MAC model to interpret and enforce.
     </t>
+    <t>
+      In particular, it is the responsibility of the LFS specification
+      to define a maximum size for the opaque section, slai_data&lt;&gt;.
+      When creating or modifying a label for an object, the client
+      needs to be guaranteed that the server will accept a label
+      that is sized correctly. By both client and server being part
+      of a specific MAC model, the client will be aware of the size.
+    </t>
   </section>
 
   <section anchor='ss:macsec:delegs' title='Delegations'>
@@ -288,7 +296,7 @@
     </t>
   </section>
 
-  <section anchor='ss:macsec:ojects' title='Object Creation'>
+  <section anchor='ss:macsec:objects' title='Object Creation'>
     <t>
       When creating files in NFSv4 the OPEN and CREATE operations are used.
       One of the parameters to these operations is an fattr4 structure
@@ -353,7 +361,7 @@
         The actual translation function will vary based on MAC model and
         policy and is out of the scope of this document.  If a translation is
         unavailable for a given LFS and DOI then the request SHOULD be
-        denied.  Another recource is to allow the host to provide a fallback
+        denied.  Another recourse is to allow the host to provide a fallback
         mapping for unknown security attributes.
       </t>
     </section>
@@ -487,7 +495,7 @@
 
 <section anchor='sec:namespace' title='Namespace Access'>
   <t>
-<cref anchor="Q6" source="TH">This section was lost going from reqirements to support.</cref>
+<cref anchor="Q6" source="TH">This section was lost going from requirements to support.</cref>
   </t>
 
   <t>
@@ -508,9 +516,9 @@
     MAC labeling is meant to allow NFSv4 to be deployed in site
     configurable security schemes. The LFS and opaque data scheme
     allows for flexibility to meet these different implementations.
-    In this section, we provide some exmaples of how NFSv4
+    In this section, we provide some examples of how NFSv4
     could be deployed to meet existing needs. This is not an
-    ehaustive listing.
+    exhaustive listing.
   </t>
 
   <section anchor='ss:examples:full' title='Full MAC labeling support for remotely mounted filesystems'>
