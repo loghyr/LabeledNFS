@@ -2,6 +2,16 @@
 <!-- Copyright (C) The Internet Society (2011) -->
 <section title="Acknowledgments">
 	<t>
+    Kathleen Moriarty provided the use cases for ITAR and Legal Hold/eDiscovery.
+  </t>
+
+  <t>
+    Dan Walsh provided use cases for Secure Virtualization, Sandboxing,
+    and NFS homedir labeling to handle process separation.
+  </t>
+
+  <t>
+    Trond Myklebust provided use cases for secure diskless NFS clients.
   </t>
 </section>
 
