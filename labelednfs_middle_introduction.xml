@@ -67,7 +67,8 @@
     These four requirements are key to the system with only requirements
     (2) and (3) requiring changes to NFSv4.  The ability to convey
     the security attribute of the subject as described in requirement (1)
-    falls upon the RPC layer to implement.  Requirement (4) allows
+    falls upon the RPC layer to implement
+    (see <xref target='ref:rpcsecgssv3' />).  Requirement (4) allows
     communication between different MAC implementations.  The management
     of label formats, DOIs, and the translation between them does not
     require any support from NFSv4 on a protocol level and is out of the
@@ -638,11 +639,38 @@
 
   <section anchor='ss:examples:diskless' title='Diskless Linux'>
     <t>
-      SELinux is one of the prime consumers of this technology.  Without
-      this support, it would be impossible to run a diskless system, which
-      uses NFS for the root file system, and continue to be protected in
-      the same fashion as more traditional disk based root file systems.
-<cref anchor="Q4" source="TH">This needs fleshing out!</cref>
+      A number of popular operating system distributions depend on
+      a mandatory access control (MAC) model to implement a
+      kernel-enforced security policy. Typically, such models assign
+      particular roles to individual processes, which limit or
+      permit performing certain operations on a set of files,
+      directories, sockets, or other objects.  While the enforcing
+      of the policy is typically a matter for the diskless NFS
+      client itself, the filesystem objects in such models will
+      typically carry MAC labels that are used to define policy on
+      access.  These policies may, for instance, describe privilege
+      transitions that cannot be replicated using standard NFS ACL
+      based models.
+    </t>
+
+    <t>
+      For instance on a SYSV compatible system, if the 'init' process
+      spawns a process that attempts to start the 'NetworkManager'
+      executable, there may be a policy that sets up a role transition
+      if the 'init' process and 'NetworkManager' file labels match
+      a particular rule. Without this role transition, the process
+      may find itself having insufficient privileges to perform its
+      primary job of configuring network interfaces.
+    </t>
+
+    <t>
+      In setups of this type, a lot of the policy targets (such as
+      sockets or privileged system calls) are entirely local to the
+      client. The use of RPCSEC_GSSv3 for enforcing compliance at
+      the server level is therefore of limited value. The ability
+      to permanently label files and have those labels read back
+      by the client is, however, crucial to the ability to enforce
+      that policy.
     </t>
   </section>
 

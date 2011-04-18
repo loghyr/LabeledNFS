@@ -1,0 +1,95 @@
+1: What is meant by a category set here:
+
+   Multi-Level Security (MLS):  is a traditional model where objects are
+      given a sensitivity level (Unclassified, Secret, Top Secret, etc)
+      and a category set.
+
+Action:
+Owner:
+State:
+Target:
+
+2: What mechanisim are we going to employ to allow the server to
+inform the client that a label has changed?
+
+Note that this only applies to files that a client currently has open on that server.
+
+Note that if label changes are rare, then the CB mechanism might
+be sufficient.
+
+Action:
+Owner:
+State:
+Target:
+
+3: How does a client and a server express which LSF they support?
+
+The server will be able to check slai_lfs to check if they are the same.
+
+If we go with the ROOTFH always having a label which any client can
+retrieve, then:
+
+PUTROOTFH, GETATTR {FATTR4_SEC_LABEL}
+
+will allow the client to make that determination.
+
+Action:
+Owner:
+State:
+Target:
+
+4: Do we want to add the following error codes
+
+NFS4ERR_WRONG_LFS - client has presented a LFS the server does not support
+NFS4ERR_BAD_LABEL - client has presented a label which is incorrect
+NFS4ERR_MAC_ACCESS - client is not allowed MAC access (and no check was made for DAC access)
+
+Action:
+Owner:
+State:
+Target:
+
+5: Are we going to support file delegations?
+
+Action:
+Owner:
+State:
+Target:
+
+6: Are we going to support directory delegations?
+
+Action:
+Owner:
+State:
+Target:
+
+7: Need to document how this works with pNFS.
+
+Action:
+Owner:
+State:
+Target:
+
+8: Need to document that it is up to the DOI to define subject labels for dumb clients.
+
+Action:
+Owner:
+State:
+Target:
+
+9: What is the root protection issue?
+
+Action:
+Owner:
+State:
+Target:
+
+10: We need a term for the security system.
+
+Note: we might just define it as itself...
+
+Action:
+Owner:
+State:
+Target:
+
