@@ -52,7 +52,6 @@
       <t>
         Server must provide a mechanism for notifying clients of attribute
         changes of files on the server.
-<cref anchor="Q3" source="TH">How is this done? A CB? Or do I have this item wrong?</cref>
       </t>
 
       <t>
@@ -90,7 +89,18 @@
   </t>
 
   <t>
-    The second change necessary is a modification to the RPC layer used
+    The second change is to provide a method for the server to
+    notify the client that the attribute changed on an open
+    file on the server. If the file is closed, then during the
+    open attempt, the client will gather the new attribute value.
+    The server MUST not communicate the new value of the attribute,
+    the client MUST query it. This requirement stems from the
+    need for the client to provide sufficient access rights to
+    the attribute.
+  </t>
+
+  <t>
+    The final change necessary is a modification to the RPC layer used
     in NFSv4 in the form of a new version of the
     RPCSEC_GSS <xref target='ref:RFC2203' /> framework.
     In order for an NFSv4 server to apply MAC checks it must obtain
@@ -151,7 +161,7 @@
       </t>
     </list>
 
-<cref anchor="Q2" source="TH">What is a category set?.</cref>
+<cref anchor="Q2" source="TH">What is a category set?</cref>
   </t>
 </section>
 
@@ -311,6 +321,150 @@
       <xref target='sec:modes' />.
     </t>
   </section>
+
+  <section anchor='ss:macsec:existing' title='Existing Objects'>
+    <t>
+      If an existing server is upgraded to include LNFS support,
+      then it is the responsibility of the security system to
+      define the behavior for existing objects. For example, if
+      the security system is LFS 0, which means the server just
+      stores and returns labels, then existing files should
+      return labels which are set to an empty value.
+    </t>
+  </section>
+</section>
+
+<section anchor='ss:cb:lc' title='Procedure 15: CB_LABEL_CHANGED - Notify Client that MAC Label Changed'>
+  <section toc='exclude' anchor="ss:cblc:args" title='ARGUMENTS'>
+    <figure>
+      <artwork>
+   struct CB_LABEL_CHANGED4args {
+           nfs_fh4         clca_fh;
+   };
+      </artwork>
+    </figure>
+  </section>
+
+  <section toc='exclude' anchor="ss:cblc:result" title='RESULTS'>
+    <figure>
+      <artwork>
+   struct CB_LABEL_CHANGED4res {
+           nfsstat4        clcr_status;
+   };
+      </artwork>
+    </figure>
+  </section>
+
+  <section toc='exclude' anchor="ss:cblc:desc" title="DESCRIPTION">
+    <t>
+      The CB_LABEL_CHANGED callback operation is used by the
+      server to indicate that the MAC label for the file
+      referenced by clca_fh has changed. In many ways, the
+      server does not care about the result returned by the
+      client.
+    </t>
+
+    <t>
+      As the server is always presented with the subject
+      label from the client, it does not necessarily need to
+      communicate the fact that the label has changed to
+      the client. In the cases where the change outright denies
+      the client access, the client will be able to quickly
+      determine that there is a new label in effect. It is
+      in cases where the client may share the same object
+      between multiple subjects or a security system which
+      is not strictly hierarchical that this callback is
+      very useful. It basically informs the client that the
+      cached security attribute is now stale.
+    </t>
+  </section> 
+
+  <section toc='exclude' anchor="ss:cblc:impl" title="IMPLEMENTATION">
+    <t>
+      In the scenario presented in <xref target='ss:examples:simple' />,
+      the clients are smart and the server has a very simple security
+      system which just stores the labels. In this system, the
+      MAC label check always allows access, regardless of the
+      subject label. 
+    </t>
+
+    <t>
+      The way in which MAC labels are enforced is by the smart
+      client. So if client A changes a security label on a file,
+      then the server MUST inform all clients that have the file
+      opened that the label has changed via CB_LABEL_CHANGED. Then
+      the clients MUST retrieve the new label and MUST enforce
+      access via the new attribute values.
+    </t>
+
+    <t>
+      <cref anchor="AI1" source="TH">
+        Describe a LFS of 0, which will be the means
+        to indicate such a deployment. In the current
+        LFR, 0 is marked as reserved. If we use it, then
+        we define the default LFS to be used by a LNFS aware
+        server. I.e., it lets smart clients work together in
+        the face of a dumb server.  Note that will supporting
+        this system is optional, it will make for a very good
+        debugging mode during development. I.e., even if a server
+        does not deploy with another security system, this
+        mode gets your foot in the door.
+      </cref>
+    </t>
+  </section> 
+</section>
+
+<section anchor='sec:pnfs' title='pNFS Considerations'>
+  <t>
+    This section examines the issues in deploying LNFS in
+    a pNFS community of servers.
+  </t>
+
+  <section toc='exclude' anchor="ss:pnfs:checks" title="MAC Label Checks">
+    <t>
+      The new FATTR4_SEC_LABEL attribute is metadata information
+      and as such the DS is not aware of the value contained
+      on the MDS. Fortunately, the NFSv4.1 protocol <xref target='RFC5661' />
+      already has provisions for doing access level checks from
+      the DS to the MDS. In order for the DS to validate
+      the subject label presented by the client, it SHOULD
+      utilize this mechanism. Further, the MDS can utilize
+      fencing to revoke access.
+    </t>
+  </section> 
+</section>
+
+<section anchor='sec:discovery' title='Discovery of Server LNFS Support'>
+  <t>
+    The server can easily determine that a client supports LNFS
+    when it queries for the FATTR4_SEC_LABEL label for an object.
+    Note that it cannot assume that the presence of RPCSEC_GSSv3
+    indicates LNFS support. The client might need to discover
+    which LFS the server supports.
+  </t>
+
+  <t>
+    A server which supports LNFS MUST allow a client with any subject
+    label to retrieve the FATTR4_SEC_LABEL attribute for the root
+    filehandle, ROOTFH. The following compound must always succeed
+    as far as a MAC label check is concerned:
+  </t>
+
+  <figure>
+    <artwork>
+   PUTROOTFH, GETATTR {FATTR4_SEC_LABEL}
+    </artwork>
+  </figure>
+
+  <t>
+    Note that the server might have imposed a security flavor on
+    the root that precludes such access. I.e., if the server
+    requires kerberized access and the client presents a compound
+    with AUTH_SYS, then the server is allowed to return NFS4ERR_WRONGSEC
+    in this case. But if the client presents a correct security
+    flavor, then the server MUST return the FATTR4_SEC_LABEL attribute
+    with the supported LFS filled in.
+  </t>
 </section>
 
 <section anchor='sec:modes' title='MAC Security NFS Modes of Operation'>
@@ -333,8 +487,9 @@
       perform an access control check based on all relevant information
       within the network.  The file object security attribute is provided
       using the mechanism described in <xref target='sec:macsec' />.  The
-      security attribute of the subject making the request is transported at the RPC layer
-      using the mechanism described in RPCSECGSSv3 <xref target='ref:rpcsecgssv3' />.
+      security attribute of the subject making the request is transported
+      at the RPC layer using the mechanism described in RPCSECGSSv3
+      <xref target='ref:rpcsecgssv3' />.
     </t>
 
     <section anchor='ss:modes:fm_ilt' title='Initial Labeling and Translation'>
@@ -779,9 +934,6 @@
   <t>
     Depending on the level of protection the MAC system offers there may
     be a requirement to tightly bind the security attribute to the data.
-    It must be taken into consideration that when used in a pNFS
-    environment is it possible that the security attribute and file data
-    will be stored on separate servers.
   </t>
 
   <t>

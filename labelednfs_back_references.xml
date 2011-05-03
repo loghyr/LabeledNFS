@@ -123,5 +123,25 @@
     <format type="TXT"
       target="ftp://ftp.isi.edu/in-notes/rfc4506.txt"/>
   </reference>
+
+    <reference anchor='RFC5661'>
+      <front>
+  <title>Network File System (NFS) Version 4 Minor Version 1 Protocol</title>
+  <author initials="S." surname="Shepler" fullname="S. Shepler">
+    <organization>Storspeed, Inc.</organization>
+  </author>
+  <author initials="M." surname="Eisler" fullname="M. Eisler">
+    <organization>NetApp</organization>
+  </author>
+  <author initials="D." surname="Noveck" fullname="D. Noveck">
+    <organization>NetApp</organization>
+  </author>
+  <date year="2010" month="January"/>
+      </front>
+      <seriesInfo name="RFC" value="5661"/>
+      <format type="TXT" octets="600988" 
+        target="ftp://ftp.isi.edu/in-notes/rfc5661.txt"/>
+    </reference>
+
         
 </references>

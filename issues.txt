@@ -17,9 +17,9 @@ Note that this only applies to files that a client currently has open on that se
 Note that if label changes are rare, then the CB mechanism might
 be sufficient.
 
-Action:
-Owner:
-State:
+Action: Add text
+Owner: Tom
+State: Needs review
 Target:
 
 3: How does a client and a server express which LSF they support?
@@ -33,9 +33,9 @@ PUTROOTFH, GETATTR {FATTR4_SEC_LABEL}
 
 will allow the client to make that determination.
 
-Action:
-Owner:
-State:
+Action: Add text
+Owner: Tom
+State: Needs review
 Target:
 
 4: Do we want to add the following error codes
