@@ -4,10 +4,11 @@
       given a sensitivity level (Unclassified, Secret, Top Secret, etc)
       and a category set.
 
-Action:
-Owner:
-State:
+Action: Tracked down definition
+Owner: Tom
+State: Finished
 Target:
+Note: http://docs.redhat.com/docs/en-US/Red_Hat_Enterprise_Linux/5/html/Deployment_Guide/sec-mls-ov.html
 
 2: What mechanisim are we going to employ to allow the server to
 inform the client that a label has changed?

@@ -145,3 +145,20 @@
 
         
 </references>
+
+<references title="Informative References">
+
+  <reference anchor='ref:rh_mls'>
+    <front>
+      <title>
+        Section 46.6. Multi-Level Security (MLS) of Deployment Guide:
+        Deployment, configuration and administration of Red Hat Enterprise
+        Linux 5, Edition 6
+      </title>
+      <author />
+      <date year='2011' />
+    </front>
+    <format type='HTML' target='http://docs.redhat.com/docs/en-US/Red_Hat_Enterprise_Linux/5/html/Deployment_Guide/sec-mls-ov.html' />
+  </reference>
+
+</references>
