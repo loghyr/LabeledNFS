@@ -423,7 +423,7 @@
     <t>
       The new FATTR4_SEC_LABEL attribute is metadata information
       and as such the DS is not aware of the value contained
-      on the MDS. Fortunately, the NFSv4.1 protocol <xref target='RFC5661' />
+      on the MDS. Fortunately, the NFSv4.1 protocol <xref target='ref:RFC5661' />
       already has provisions for doing access level checks from
       the DS to the MDS. In order for the DS to validate
       the subject label presented by the client, it SHOULD
