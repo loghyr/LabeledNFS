@@ -245,12 +245,12 @@
     const FATTR4_SEC_LABEL   = 81;
 
     typedef uint32_t  policy4;
-    struct labelformat_spec4 = {
+    struct labelformat_spec4 {
       policy4   lfs_lfs;
       policy4   lfs_pi;
     };
 
-    struct sec_label_attr_info = {
+    struct sec_label_attr_info {
       labelformat_spec4   slai_lfs;
       opaque              slai_data&lt;&gt;;
     };
