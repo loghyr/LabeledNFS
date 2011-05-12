@@ -333,7 +333,7 @@
   </section>
 </section>
 
-<section anchor='ss:cb:lc' title='Procedure 15: CB_LABEL_CHANGED - Notify Client that MAC Label Changed'>
+<section anchor='ss:cb:lc' title='Procedure 16: CB_LABEL_CHANGED - Notify Client that MAC Label Changed'>
   <section toc='exclude' anchor="ss:cblc:args" title='ARGUMENTS'>
     <figure>
       <artwork>
@@ -643,24 +643,6 @@
       </t>
     </section>
   </section>
-</section>
-
-<section anchor='sec:namespace' title='Namespace Access'>
-  <t>
-<cref anchor="Q6" source="TH">This section was lost going from requirements to support.</cref>
-  </t>
-
-  <t>
-    The server should provide a means to authorize selective access to
-    the exported file system namespace based upon client credentials and
-    according to security policy.
-  </t>
-
-  <t>
-    This is a common requirement of MLS-enabled systems, which often need
-    to present selective views of namespaces based upon the clearances of
-    the subjects.
-  </t>
 </section>
 
 <section anchor='sec:examples' title='Use Cases'>

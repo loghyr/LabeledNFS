@@ -143,28 +143,6 @@
         target="ftp://ftp.isi.edu/in-notes/rfc5661.txt"/>
     </reference>
 
-  <reference anchor='ref:RFC5570'>
-    <front>
-      <title>
-        Common Architecture Label IPv6 Security Option (CALIPSO)
-      </title>
-      <author initials='M' surname='StJohns'>
-        <organization>Consultant</organization>
-      </author>
-      <author initials='R' surname='Atkinson'>
-        <organization>Extreme Networks</organization>
-      </author>
-      <author initials='G' surname='Thomas'>
-        <organization>US Department of Defense</organization>
-      </author>
-      <date month='July' year='2009' />
-    </front>
-    <seriesInfo name='RFC' value='5570' />
-    <format type='TXT'
-      target='ftp://ftp.isi.edu/in-notes/rfc5570.txt' />
-  </reference>
-
-        
 </references>
 
 <references title="Informative References">
