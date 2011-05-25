@@ -258,7 +258,7 @@
     </figure>
 
     <t>
-      The FATTR4_SEC_LABEL contains two components with the first
+      The FATTR4_SEC_LABEL contains an array of two components with the first
       component being an LFS.  It serves to provide the receiving end
       with the information necessary to translate the security attribute
       into a form that is usable by the endpoint.  Label Formats assigned
@@ -323,7 +323,8 @@
 
   <section anchor='ss:macsec:existing' title='Existing Objects'>
     <t>
-      If an existing server is upgraded to include LNFS support,
+      Note that under the MAC model, all objects must have labels.
+      Therefore, if an existing server is upgraded to include LNFS support,
       then it is the responsibility of the security system to
       define the behavior for existing objects. For example, if
       the security system is LFS 0, which means the server just
@@ -331,36 +332,25 @@
       return labels which are set to an empty value.
     </t>
   </section>
-</section>
 
-<section anchor='ss:cb:lc' title='Procedure 16: CB_LABEL_CHANGED - Notify Client that MAC Label Changed'>
-  <section toc='exclude' anchor="ss:cblc:args" title='ARGUMENTS'>
-    <figure>
-      <artwork>
-   struct CB_LABEL_CHANGED4args {
-           nfs_fh4         clca_fh;
-   };
-      </artwork>
-    </figure>
-  </section>
-
-  <section toc='exclude' anchor="ss:cblc:result" title='RESULTS'>
-    <figure>
-      <artwork>
-   struct CB_LABEL_CHANGED4res {
-           nfsstat4        clcr_status;
-   };
-      </artwork>
-    </figure>
-  </section>
-
-  <section toc='exclude' anchor="ss:cblc:desc" title="DESCRIPTION">
+  <section anchor='ss:macsec:changes' title='Label Changes'>
     <t>
-      The CB_LABEL_CHANGED callback operation is used by the
-      server to indicate that the MAC label for the file
-      referenced by clca_fh has changed. In many ways, the
-      server does not care about the result returned by the
-      client.
+      As per the requirements, when a file's security label is
+      modified, the server must notify all clients which have
+      the file opened of the change in label. It does so with
+      CB_ATTR_CHANGED. There are preconditions to making an
+      attribute change imposed by NFSv4 and the security system might
+      want to impose others. In the process of meeting these
+      preconditions, the server may chose to either serve
+      the request in whole or return NFS4ERR_DELAY to the
+      SETATTR operation.
+    </t>
+
+    <t>
+      If there are open delegations on the file
+      belonging to client other than the one making the label
+      change, then the process described in
+      <xref target='ss:macsec:delegs' /> must be followed.
     </t>
 
     <t>
@@ -372,13 +362,11 @@
       determine that there is a new label in effect. It is
       in cases where the client may share the same object
       between multiple subjects or a security system which
-      is not strictly hierarchical that this callback is
-      very useful. It basically informs the client that the
-      cached security attribute is now stale.
+      is not strictly hierarchical that the CB_ATTR_CHANGED callback is
+      very useful. It allows the server to inform the clients
+      that the cached security attribute is now stale.
     </t>
-  </section> 
 
-  <section toc='exclude' anchor="ss:cblc:impl" title="IMPLEMENTATION">
     <t>
       In the scenario presented in <xref target='ss:examples:simple' />,
       the clients are smart and the server has a very simple security
@@ -391,7 +379,7 @@
       The way in which MAC labels are enforced is by the smart
       client. So if client A changes a security label on a file,
       then the server MUST inform all clients that have the file
-      opened that the label has changed via CB_LABEL_CHANGED. Then
+      opened that the label has changed via CB_ATTR_CHANGED. Then
       the clients MUST retrieve the new label and MUST enforce
       access via the new attribute values.
     </t>
@@ -410,6 +398,54 @@
         mode gets your foot in the door.
       </cref>
     </t>
+  </section>
+</section>
+
+<section anchor='ss:cb:lc' title="Procedure 16: CB_ATTR_CHANGED - Notify Client that the File's Attributes Changed">
+  <section toc='exclude' anchor="ss:cbac:args" title='ARGUMENTS'>
+    <figure>
+      <artwork>
+   struct CB_ATTR_CHANGED4args {
+           nfs_fh4         acca_fh;
+           bitmap4         acca_critical;
+           bitmap4         acca_info;
+   };
+      </artwork>
+    </figure>
+  </section>
+
+  <section toc='exclude' anchor="ss:cbac:result" title='RESULTS'>
+    <figure>
+      <artwork>
+   struct CB_ATTR_CHANGED4res {
+           nfsstat4        accr_status;
+   };
+      </artwork>
+    </figure>
+  </section>
+
+  <section toc='exclude' anchor="ss:cbac:desc" title="DESCRIPTION">
+    <t>
+      The CB_ATTR_CHANGED callback operation is used by the
+      server to indicate to the client that the file's attributes
+      have been modified on the server. The server does not
+      convey how the attributes have changed, just that they
+      have been modified.  The server can inform the client
+      about both critical and informational attribute changes
+      in the bitmask arguments. The client SHOULD query the
+      server about all attributes set in acca_critical. For
+      all changes reflected in acca_info, the client can decide
+      whether or not it wants to poll the server.
+    </t>
+
+    <t>
+      The CB_ATTR_CHANGED callback operation with the FATTR4_SEC_LABEL
+      set in acca_critical is the method used by the
+      server to indicate that the MAC label for the file
+      referenced by acca_fh has changed. In many ways, the
+      server does not care about the result returned by the
+      client.
+    </t>
   </section> 
 </section>
 
@@ -427,8 +463,13 @@
       already has provisions for doing access level checks from
       the DS to the MDS. In order for the DS to validate
       the subject label presented by the client, it SHOULD
-      utilize this mechanism. Further, the MDS can utilize
-      fencing to revoke access.
+      utilize this mechanism.
+    </t>
+
+    <t>
+      If a file's FATTR4_SEC_LABEL is changed, then the MDS
+      should utilize CB_ATTR_CHANGED to inform the client
+      of that fact. If the MDS is maintaining 
     </t>
   </section> 
 </section>
@@ -924,6 +965,13 @@
     handle the lack of MAC support
     and care should be taken to identify and mitigate threats from
     possible tampering outside of these methods.
-<cref anchor="Q5" source="TH">Did not want to lose the above concern</cref>
+  </t>
+
+  <t>
+    An example of this is that a smart server that modifies READDIR
+    or LOOKUP results based on the client's subject label might want
+    to always construct the same subject label for a client which
+    does not present one. This will prevent a non-LNFS client from
+    mixing entries in the directory cache.
   </t>
 </section>
