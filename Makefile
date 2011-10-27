@@ -4,8 +4,8 @@
 YEAR=`date +%Y`
 MONTH=`date +%B`
 DAY=`date +%d`
-PREVVERS=02
-VERS=03
+PREVVERS=03
+VERS=04
 
 autogen/%.xml : %.x
 	@mkdir -p autogen
