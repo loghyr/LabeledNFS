@@ -499,6 +499,97 @@
   </t>
 </section>
 
+<section anchor='sec:func' title='LNFS Areas of Functionality'>
+  <t>
+    LNFS functionality falls into three areas for both clients and
+    servers: object label functionality, subject label
+    functionality, and policy enforcement.  The three areas of functionality
+    are independent in the protocol specification, but in practice,
+    clients or servers that support subject label functionality will
+    typically also support object label functionality, and servers
+    that support policy enforcement will typically also support
+    subject and object label functionality.
+  </t>
+
+  <section anchor='ss:func:clientobj' title='Client Object Labeling'>
+     <t>
+      Client object label functionality falls into two areas:
+      <list>
+	<t>
+	  Specifying the MAC security attribute for file creation requests
+	  as described in <xref target="ss:macsec:objects" />.
+	</t>
+	<t>
+	  Handling label change callbacks from the server
+	  as described in <xref target='ss:macsec:changes' />.
+	</t>
+      </list>
+     </t>
+  </section>
+
+  <section anchor='ss:func:clientsubj' title='Client Subject Labeling'>
+     <t>
+      Client subject label functionality consists of asserting
+      the subject label for the requesting process on the client to the server.
+      The security attribute of the subject making the request is transported
+      at the RPC layer using the mechanism described in RPCSECGSSv3
+      <xref target='ref:rpcsecgssv3' />.
+     </t>
+  </section>
+
+  <section anchor='ss:func:clientenforce' title='Client Policy Enforcement'>
+     <t>
+      Client policy enforcement functionality consists of applying MAC
+      policy checks based on the subject label of the requesting
+      process on the client and the object label of the file.  If
+      object labeling is supported by the server, then the client will
+      use the object label provided by the server for the access decision.
+      If not, then the client may infer an object label for the file
+      based on other criteria at its disposal, e.g. based on the
+      server identity, the particular mount, or a local mapping.
+     </t>
+  </section>
+
+  <section anchor='ss:func:serverobj' title='Server Object Labeling'>
+    <t>
+      Server object label functionality falls into two areas:
+      <list>
+	<t>
+	  Storing and returning file labels.
+	</t>
+	<t>
+	  Sending label change callbacks when a label change is performed.
+	</t>
+      </list>
+    </t>
+  </section>
+
+  <section anchor='ss:func:serversubj' title='Server Subject Labeling'>
+    <t>
+      Server subject label functionality consists of accepting
+      RPCSEC_GSSv3 label assertions.
+    </t>
+   </section>
+
+  <section anchor='ss:func:serverenforce' title='Server Policy Enforcement'>
+     <t>
+      Server policy enforcement functionality consists of applying MAC
+      policy checks based on the subject label of the requesting
+      process on the client and the object label of the file.  If 
+      the client and the server both support subject label functionality,
+      then the subject label provided by the client will be used for the
+      access decision.  If either the client or the server do not support
+      subject label functionality, then the server may infer a subject
+      label based on other criteria at its disposal, e.g. based on the
+      client identity.  If the server supports object label functionality,
+      then the object label that is stored with the file will be used
+      for the access decision.  If not, then an object label may be
+      inferred from other criteria at its disposal, e.g. based on the
+      exported filesystem or some local mapping.
+     </t>
+  </section>
+</section>
+
 <section anchor='sec:modes' title='MAC Security NFS Modes of Operation'>
   <t>
     A system using Labeled NFS may operate in three modes.  The first
