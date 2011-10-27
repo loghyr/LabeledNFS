@@ -55,9 +55,8 @@
       </t>
 
       <t>
-        Clients and Servers must be able to negotiate Label Formats and
-        Domains of Interpretation (DOI) and provide a mechanism to
-        translate between them as needed.
+        Clients and Servers must be able to negotiate Label Formats 
+        and provide a mechanism to translate between them as needed.
       </t>
     </list>
   </t>
@@ -69,7 +68,7 @@
     falls upon the RPC layer to implement
     (see <xref target='ref:rpcsecgssv3' />).  Requirement (4) allows
     communication between different MAC implementations.  The management
-    of label formats, DOIs, and the translation between them does not
+    of label formats and the translation between them does not
     require any support from NFSv4 on a protocol level and is out of the
     scope of this document.
   </t>
@@ -134,13 +133,6 @@
         is an optional part of the definition of a Label
         Format Specifier which allows for clients and server to identify
         specific security policies.
-      </t>
-
-      <t hangText='Domain of Interpretation (DOI):'>
-        represents
-        an administrative security boundary, where all systems within the DOI
-        have semantically coherent labeling.  That is, a security attribute
-        must always mean exactly the same thing anywhere within the DOI.
       </t>
 
       <t hangText='Object:'>
@@ -548,12 +540,12 @@
         model and policy.  To handle this the security attribute field has an
         LFS component.  This component is a mechanism for the host to
         identify the format and meaning of the opaque portion of the security
-        attribute.  A full mode environment may contain hosts operating in
-        several different LFSs and DOIs.  In this case a mechanism for
+        attribute.  A full mode environment may contain hosts using 
+        several different label formats.  In this case a mechanism for
         translating the opaque portion of the security attribute is needed.
         The actual translation function will vary based on MAC model and
         policy and is out of the scope of this document.  If a translation is
-        unavailable for a given LFS and DOI then the request SHOULD be
+        unavailable for a given LFS then the request SHOULD be
         denied.  Another recourse is to allow the host to provide a fallback
         mapping for unknown security attributes.
       </t>
@@ -610,12 +602,12 @@
       </t>
 
       <t>
-        In a smart client environment a group of clients operate in a single
-        DOI.  This removes the need for the clients to maintain a set of DOI
-        translations.  Servers should provide a method to allow different
+        In a smart client environment a group of clients operate use the
+        same label format.  This removes the need for the clients to maintain
+	a set of translations.  Servers should provide a method to allow different
         groups of clients to access the server at the same time.  However it
-        should not let two groups of clients operating in different DOIs to
-        access the same files.
+        should not let two groups of clients operating with different label
+	formats access the same files.
       </t>
     </section>
 
@@ -661,8 +653,8 @@
       <t>
         In smart server mode security attributes are contained solely within
         the NFSv4 server.  This means that all security attributes used in
-        the system remain within a single LFS and DOI.  Since security
-        attributes will not cross DOIs or change format there is no need to
+        the system remain within a single LFS.  Since security
+        attributes will not change format there is no need to
         provide any translation functionality above that which is needed
         internally by the MAC model.
       </t>
