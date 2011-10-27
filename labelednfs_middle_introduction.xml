@@ -360,20 +360,15 @@
     </t>
 
     <t>
-      In the scenario presented in <xref target='ss:examples:simple' />,
-      the clients are smart and the server has a very simple security
-      system which just stores the labels. In this system, the
-      MAC label check always allows access, regardless of the
-      subject label. 
-    </t>
-
-    <t>
-      The way in which MAC labels are enforced is by the smart
-      client. So if client A changes a security label on a file,
-      then the server MUST inform all clients that have the file
-      opened that the label has changed via CB_ATTR_CHANGED. Then
-      the clients MUST retrieve the new label and MUST enforce
-      access via the new attribute values.
+      In the scenario presented in <xref target='ss:examples:simple'
+      />, the clients provide policy enforcement functionality and the
+      server only provides object labeling functionality. In order to
+      ensure that policy is enforced upon a label change in this situation,
+      if client A changes a security label on a file, then the server
+      MUST inform all clients that have the file opened that the label
+      has changed via CB_ATTR_CHANGED. Then the clients MUST retrieve
+      the new label and MUST enforce access via the new attribute
+      values.
     </t>
 
     <t>
@@ -382,12 +377,12 @@
         to indicate such a deployment. In the current
         LFR, 0 is marked as reserved. If we use it, then
         we define the default LFS to be used by a LNFS aware
-        server. I.e., it lets smart clients work together in
-        the face of a dumb server.  Note that will supporting
-        this system is optional, it will make for a very good
-        debugging mode during development. I.e., even if a server
-        does not deploy with another security system, this
-        mode gets your foot in the door.
+        server. I.e., it enables policy-enforcing clients to work together in
+        the face of a server that only supports object labeling.  
+	Note that while supporting this system is optional, it will
+	make for a very good debugging mode during development. I.e.,
+	even if a server does not deploy with another security system,
+	this mode gets your foot in the door.
       </cref>
     </t>
   </section>
@@ -957,7 +952,7 @@
       also labeled Top Secret.
     </t>
 
-    <section anchor='ss:examples:fm' title='Full Mode'>
+    <section anchor='ss:examples:fm' title='Policy-Enforcing Client and Server'>
       <t>
         In the first part of this example a process on the client is running
         at the Secret level.  The process issues a readdir system call which
@@ -1002,30 +997,33 @@
       </t>
     </section>
 
-    <section anchor='ss:examples:scm' title='Smart Client Mode'>
+    <section anchor='ss:examples:pec' title='Policy-Enforcing Client'>
       <t>
-        In smart client mode the example is identical to the first part of a
-        full mode operation.  A process on the client labeled Secret wishes
-        to access a Top Secret directory.  As in the full mode example this
-        is denied since Secret does not dominate Top Secret.  If the process
-        were operating at Top Secret it would pass the local access control
-        check and the NFSv4 operation would proceed as in a normal NFSv4
-        environment.
+        With a policy-enforcing client and a label-unaware server,
+        this example is identical to the first part of the previous
+        example.  A process on the client labeled Secret wishes to
+        access a Top Secret directory.  As in the previous example,
+        this is denied since Secret does not dominate Top Secret.  If
+        the process were operating at Top Secret it would pass the
+        local access control check and the NFSv4 operation would
+        proceed as in a normal NFSv4 environment.
       </t>
     </section>
 
-    <section anchor='ss:examples:ssm' title='Smart Server Mode'>
+    <section anchor='ss:examples:pes' title='Policy-Enforcing Server'>
       <t>
-        In a smart server mode the client behaves as if it were in a normal
-        NFSv4 environment.  Since the process on the client does not provide
-        a security attribute the server must define a mechanism for labeling
-        all requests from a client.  Assume that the server is using the same
-        criteria used in the full mode example.  The server sees the request
-        as coming from a subnet that is a Secret network.  The server
-        determines that all clients on that subnet will have their requests
-        labeled with Secret.  Since the directory on the server is labeled
-        Top Secret and Secret does not dominate Top Secret the server would
-        fail the request with NFS4ERR_ACCESS.
+        With a policy-enforcing server and a label-unaware client, the
+        client behaves as if it were in a normal NFSv4 environment.
+        Since the process on the client does not provide a security
+        attribute the server must define a mechanism for labeling all
+        requests from a client.  Assume that the server is using the
+        same criteria used in the first example.  The server sees
+        the request as coming from a subnet that is a Secret network.
+        The server determines that all clients on that subnet will
+        have their requests labeled with Secret.  Since the directory
+        on the server is labeled Top Secret and Secret does not
+        dominate Top Secret the server would fail the request with
+        NFS4ERR_ACCESS.
       </t>
     </section>
   </section>
@@ -1042,16 +1040,15 @@
   </t>
 
   <t>
-    When either the client is in Smart Client Mode or server is in
-    Smart Server Mode, it is important to realize that the other side is
-    not enforcing MAC protections.  Alternate methods might be in use to
-    handle the lack of MAC support
-    and care should be taken to identify and mitigate threats from
-    possible tampering outside of these methods.
+    When either the client or the server is label-unaware, it is
+    important to realize that the other side is not enforcing MAC
+    protections.  Alternate methods might be in use to handle the lack
+    of MAC support and care should be taken to identify and mitigate
+    threats from possible tampering outside of these methods.
   </t>
 
   <t>
-    An example of this is that a smart server that modifies READDIR
+    An example of this is that a policy-enforcing server that modifies READDIR
     or LOOKUP results based on the client's subject label might want
     to always construct the same subject label for a client which
     does not present one. This will prevent a non-LNFS client from
